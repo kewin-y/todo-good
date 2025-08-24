@@ -5,12 +5,12 @@
 The devshell contains the latest version of Postgresql
 
 ```sh
-initdb -D .tmp/pgdata -U postgres
+initdb -D .tmp/pgdata -U postgres -A md5 --pwfile=password
 
-pg_ctl -D .tmp/pgdata -l logfile -o "-k $PWD/.tmp/sockets" start
+pg_ctl -D .tmp/pgdata -l logfile -o "-k $PGHOST" start
 
 pg_ctl -D .tmp/pgdata stop
 
-pgcli -h $PWD/.tmp/sockets -U postgres
+pgcli -U postgres
 ```
 

@@ -21,8 +21,9 @@
           packages = [
             (pkgs.python313.withPackages(pypkgs: [
               pypkgs.flask
-              pypkgs.psycopg2
+              pypkgs.psycopg
               pypkgs.python-dotenv
+              pypkgs.psycopg-pool
             ]))
 
             pkgs.pgcli
@@ -31,6 +32,7 @@
 
           shellHook = ''
             export SHELL='${pkgs.mksh}/bin/mksh'
+            export PGHOST="$(pwd)/.tmp/sockets"
           '';
         };
       };

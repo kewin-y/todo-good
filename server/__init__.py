@@ -1,5 +1,4 @@
 import os
-
 from flask import Flask
 
 def create_app():
@@ -13,5 +12,7 @@ def create_app():
 
     from . import todos
     app.register_blueprint(todos.bp)
+
+    from . import db
 
     return app
