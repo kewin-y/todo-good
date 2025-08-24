@@ -1,24 +1,70 @@
-from flask import (Blueprint, jsonify, request)
+from . import db
+from flask import (Blueprint, jsonify, request, abort)
 
 bp = Blueprint("todos", __name__, url_prefix="/todos")
 
 @bp.route("/", methods=["GET"])
 def get_all_todos():
-    pass
+    with db.pool.connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT * FROM todos")
 
-@bp.route("/<int:id>", methods=["GET"])
-def get_todo_by_id(id: int):
-    pass
+            conn.commit()
+            return jsonify(cur.fetchall())
+
+@bp.route("/<int:todo_id>", methods=["GET"])
+def get_todo_by_id(todo_id: int):
+    with db.pool.connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT * FROM todos WHERE id=(%s)", (todo_id,))
+
+            conn.commit()
+            return jsonify(cur.fetchone())
 
 @bp.route("/", methods=["POST"])
 def create_todo():
-    pass
+    data = request.get_json()
 
-@bp.route("/<int:id>", methods=["DELETE"])
-def delete_todo(id: int):
-    pass
+    summary: str | None = data.get("summary", None)
 
-@bp.route("/<int:id>", methods=["PUT"])
-def update_todo(id: int):
-    pass
+    if (summary is None):
+        abort(400)
+
+    with db.pool.connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("INSERT INTO todos (summary, completed) VALUES (%s, FALSE) RETURNING *", (summary,))
+
+            conn.commit()
+            return jsonify(cur.fetchone())
+
+@bp.route("/<int:todo_id>", methods=["DELETE"])
+def delete_todo(todo_id: int):
+    with db.pool.connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM todos WHERE id=%s", (todo_id,))
+
+            conn.commit()
+            return jsonify("todo was deleted")
+
+
+@bp.route("/<int:todo_id>", methods=["PATCH"])
+def update_todo(todo_id: int):
+    data = request.get_json()
+
+    summary: str | None = data.get("summary", None)
+    completed: bool | None = data.get("completed", None)
+
+    res = {}
+
+    with db.pool.connection() as conn:
+        with conn.cursor() as cur:
+            if completed is not None:
+                cur.execute("UPDATE todos SET completed=%s WHERE id=%s RETURNING completed", (completed, todo_id))
+                res.update(cur.fetchone())
+            if summary is not None:
+                cur.execute("UPDATE todos SET summary=%s WHERE id=%s RETURNING summary", (summary, todo_id))
+                res.update(cur.fetchone())
+
+            conn.commit()
+            return jsonify(res)
 
