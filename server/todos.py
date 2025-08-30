@@ -54,17 +54,13 @@ def update_todo(todo_id: int):
     summary: str | None = data.get("summary", None)
     completed: bool | None = data.get("completed", None)
 
-    res = {}
-
     with db.pool.connection() as conn:
         with conn.cursor() as cur:
             if completed is not None:
-                cur.execute("UPDATE todos SET completed=%s WHERE id=%s RETURNING completed", (completed, todo_id))
-                res.update(cur.fetchone())
+                cur.execute("UPDATE todos SET completed=%s WHERE id=%s", (completed, todo_id))
             if summary is not None:
-                cur.execute("UPDATE todos SET summary=%s WHERE id=%s RETURNING summary", (summary, todo_id))
-                res.update(cur.fetchone())
+                cur.execute("UPDATE todos SET summary=%s WHERE id=%s", (summary, todo_id))
 
             conn.commit()
-            return jsonify(res)
+            return jsonify("todo was updated")
 

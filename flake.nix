@@ -24,10 +24,15 @@
               pypkgs.psycopg
               pypkgs.python-dotenv
               pypkgs.psycopg-pool
+              pypkgs.flask-cors
             ]))
 
             pkgs.pgcli
             pkgs.postgresql
+
+            pkgs.prettierd
+            pkgs.nodejs_22
+            pkgs.typescript-language-server
           ];
 
           shellHook = ''
