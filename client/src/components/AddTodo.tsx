@@ -1,6 +1,11 @@
 import { useState, type FormEvent } from "react";
+import type { TodoItem } from "../types/TodoItem";
 
-export default function AddTodo() {
+type AddTodoProps = {
+    handleAdd: (todo: TodoItem) => void;
+}
+
+export default function AddTodo({ handleAdd }: AddTodoProps) {
     const [summary, setSummary] = useState("");
 
     const onSubmit = async (e: FormEvent) => {
@@ -19,8 +24,9 @@ export default function AddTodo() {
             if (!response.ok) {
                 throw new Error(`Reponse status: ${response.status}`)
             }
+            const todo = await response.json();
 
-            window.location.reload();
+            handleAdd(todo);
         } catch (error: unknown) {
             if (error instanceof Error) {
                 console.log(error.message);

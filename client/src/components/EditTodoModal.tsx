@@ -1,40 +1,45 @@
 import { useEffect, useState, type FormEvent } from "react";
 import "./EditTodoModal.css";
+import type { TodoItem } from "../types";
 
 type EditTodoModalProps = {
     open: boolean;
-    editingId: number;
-    oldSummary: string;
-    modalCancel: () => void;
-    onDone: (id: number, summary: string) => void;
+    todo: TodoItem | undefined;
+    modalClose: () => void;
+    handleUpdate: (todoItem: TodoItem) => void;
 }
 
-export default function EditTodoModal({ open, editingId, oldSummary: editingOldSummary, modalCancel, onDone }: EditTodoModalProps) {
+export default function EditTodoModal({ open, todo, modalClose, handleUpdate }: EditTodoModalProps) {
+    const [summary, setSummary] = useState("");
+
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === "Escape" && open) {
-                modalCancel();
+                setSummary("");
+                modalClose();
             }
         }
         document.addEventListener("keydown", handleKeyDown);
         return () => document.removeEventListener("keydown", handleKeyDown);
     }, [open]);
 
-    const [summary, setSummary] = useState("");
 
     const onSubmitForm = (e: FormEvent) => {
         e.preventDefault();
-        onDone(editingId, summary);
-        modalCancel();
+        if (todo)
+            handleUpdate({ ...todo, summary })
+        setSummary("");
+        modalClose();
     };
 
-    if (!open) return null;
-
-    return <div className="modal">
+    return ((todo && open) && <div className="modal">
         <div className="modal-content">
             <div className="modal-header">
-                editing todo: {editingOldSummary}
-                <span className="close" onClick={() => modalCancel()}>&times;</span>
+                editing todo: {todo.summary}
+                <span className="close" onClick={() => {
+                    setSummary("");
+                    modalClose();
+                }}>&times;</span>
             </div>
             <form className="modal-form" onSubmit={onSubmitForm}>
                 <input
@@ -45,5 +50,5 @@ export default function EditTodoModal({ open, editingId, oldSummary: editingOldS
                 <button>done</button>
             </form>
         </div>
-    </div>;
+    </div>);
 }

@@ -1,115 +1,113 @@
 import AddTodo from "./components/AddTodo";
-import { type TodoItem } from "./types/TodoItem";
-import { useRef, useState, useEffect } from "react";
+import { type TodoItem } from "./types";
+import { useRef, useEffect, useReducer, useState } from "react";
 import Todo from "./components/Todo";
 import EditTodoModal from "./components/EditTodoModal";
 
+type TodoAction =
+    | { type: 'INIT'; payload: { allTodos: TodoItem[] } }
+    | { type: 'ADD_TODO'; payload: { todo: TodoItem } }
+    | { type: 'UPDATE_TODO'; payload: { todo: TodoItem } }
+    | { type: 'DELETE_TODO'; payload: { id: number } };
+
+function todoItemsReducer(todoItems: TodoItem[], action: TodoAction) {
+    switch (action.type) {
+        case "INIT": {
+            return action.payload.allTodos;
+        }
+        case "ADD_TODO": {
+            return [...todoItems, action.payload.todo];
+        }
+        case "DELETE_TODO": {
+            return todoItems.filter(todo => todo.id !== action.payload.id)
+        }
+        case "UPDATE_TODO": {
+            return todoItems.map(todo => todo.id === action.payload.todo.id ? action.payload.todo : todo);
+        }
+        default:
+            return [...todoItems];
+    }
+}
+
 export default function App() {
+    const [todoItems, dispatch] = useReducer(todoItemsReducer, []);
+    const [editingTodo, setEditingTodo] = useState<TodoItem>();
+    const [modalOpen, setModalOpen] = useState(false);
     const effectRun = useRef(false);
-    const [todos, setTodos] = useState<TodoItem[]>([]);
-
-    const [isModalOpen, setModalOpen] = useState(false);
-    const [editingId, setEditingId] = useState<number>(0);
-    const [editingOldSummary, setEditingOldSummary] = useState<string>("");
-
-    const openModal = (id: number, oldSummary: string) => {
-        setEditingId(id);
-        setEditingOldSummary(oldSummary);
-        setModalOpen(true);
-    };
-
-    const modalCancel = () => setModalOpen(false);
-
-    const updateTodo = async (id: number, summary: string) => {
-        const body = { summary };
-        try {
-            const response = await fetch(`http://localhost:5000/todos/${id}`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(body)
-            });
-            if (!response.ok) {
-                throw new Error(`Reponse status: ${response.status}`)
-            }
-            setTodos(todos.map(todo => todo.id === id ? { ...todo, summary } : todo))
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                console.log(error.message);
-            }
-        }
-    };
-
-    const deleteTodo = async (id: number) => {
-        try {
-            const response = await fetch(`http://localhost:5000/todos/${id}`, { method: "DELETE" });
-            if (!response.ok) {
-                throw new Error(`Reponse status: ${response.status}`)
-            }
-            setTodos(todos.filter(todo => todo.id !== id));
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                console.log(error.message);
-            }
-        }
-    }
-
-    const toggleTodo = async (id: number, completed: boolean) => {
-        const body = { completed };
-
-        try {
-            const response = await fetch(`http://localhost:5000/todos/${id}`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(body)
-            });
-            if (!response.ok) {
-                throw new Error(`Reponse status: ${response.status}`)
-            }
-            setTodos(todos.map(todo => todo.id === id ? { ...todo, completed } : todo))
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                console.log(error.message);
-            }
-        }
-    }
-
-    const getTodos = async () => {
-        try {
-            const response = await fetch("http://localhost:5000/todos");
-
-            if (!response.ok) {
-                throw new Error(`Reponse status: ${response.status}`)
-            }
-
-            const result = await response.json();
-            setTodos(result);
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                console.log(error.message);
-            }
-        }
-    };
 
     useEffect(() => {
-        // Prevent double-running in strict mode
         if (!effectRun.current) {
-            getTodos();
+            fetch("http://localhost:5000/todos").then(response => {
+                if (!response.ok) {
+                    throw new Error(`Reponse status: ${response.status}`)
+                }
+                return response.json();
+            }).then(data => dispatch({
+                type: "INIT",
+                payload: { allTodos: data }
+            })).catch(error => {
+                if (error instanceof Error) {
+                    console.log(error.message)
+                }
+            });
             effectRun.current = true;
         }
     }, []);
 
+    const handleAdd = (todo: TodoItem) => {
+        dispatch({ type: "ADD_TODO", payload: { todo: todo } });
+    };
+
+    const handleDelete = (id: number) => {
+        dispatch({ type: "DELETE_TODO", payload: { id: id } })
+    };
+
+    const handleUpdate = async (todo: TodoItem) => {
+        const { id, ...body } = todo;
+
+        try {
+            const response = await fetch(`http://localhost:5000/todos/${id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(body)
+            });
+            if (!response.ok) {
+                throw new Error(`Reponse status: ${response.status}`)
+            }
+
+            dispatch({ type: "UPDATE_TODO", payload: { todo: todo } });
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.log(error.message);
+            }
+        }
+
+    }
+
     return <>
-        <AddTodo />
-        <EditTodoModal open={isModalOpen} modalCancel={modalCancel} onDone={updateTodo} editingId={editingId} oldSummary={editingOldSummary} />
+        <AddTodo handleAdd={handleAdd} />
         <hr />
+        <EditTodoModal
+            open={modalOpen}
+            todo={editingTodo}
+            modalClose={() => { setModalOpen(false) }}
+            handleUpdate={handleUpdate}
+        />
         <table className="todo-list">
             <tbody>
-                {todos.map((todoItem) => (
-                    <Todo todoItem={todoItem} deleteTodo={deleteTodo} toggleTodo={toggleTodo} editTodo={openModal} key={todoItem.id} />
+                {todoItems.map((todoItem) => (
+                    <Todo
+                        todoItem={todoItem}
+                        handleDelete={handleDelete}
+                        handleUpdate={handleUpdate}
+                        onEdit={() => {
+                            setEditingTodo(todoItem);
+                            setModalOpen(true);
+                        }}
+                        key={todoItem.id}
+                    />
                 ))}
             </tbody>
         </table>
