@@ -217,6 +217,7 @@ __marimo__/
 
 .tmp/
 logfile
+password
 
 # Logs
 logs
