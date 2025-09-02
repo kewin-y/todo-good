@@ -13,6 +13,12 @@ export default function EditTodoModal({ open, todo, modalClose, handleUpdate }: 
     const [summary, setSummary] = useState("");
 
     useEffect(() => {
+        if (open && todo)
+            setSummary(todo.summary);
+    }, [open, todo])
+
+
+    useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === "Escape" && open) {
                 setSummary("");
@@ -35,7 +41,10 @@ export default function EditTodoModal({ open, todo, modalClose, handleUpdate }: 
     return ((todo && open) && <div className="modal">
         <div className="modal-content">
             <div className="modal-header">
-                editing todo: {todo.summary}
+                <div>
+                    <span style={{fontWeight: "bold"}}>editing todo</span>
+                    : {todo.summary}
+                </div>
                 <span className="close" onClick={() => {
                     setSummary("");
                     modalClose();

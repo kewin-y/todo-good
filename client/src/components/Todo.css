@@ -1,0 +1,81 @@
+.todo {
+    display: flex;
+    gap: 0.8em;
+    align-content: center;
+}
+
+.form-control {
+    display: flex;
+    gap: 0.8em;
+    line-height: 1.1;
+}
+
+.form-control > span {
+    flex: 1;
+}
+
+input[type="checkbox"] {
+    appearance: none;
+    background-color: none;
+    margin: 0;
+
+    border: 2px solid #dddddd;
+    width: 1.4em;
+    height: 1.4em;
+    border-radius: 0.7em;
+    transform: translateY(-1px);
+
+    display: grid;
+    justify-content: center;
+    align-content: center;
+}
+
+input[type="checkbox"]::before {
+    content: "";
+}
+
+input[type="checkbox"]:checked::before {
+    width: 4px;
+    height: 8px;
+    border: solid #4fabc9;
+    display: block;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+input[type="checkbox"]:checked ~ span {
+    text-decoration: line-through;
+}
+
+.todo button {
+    display: grid;
+    justify-content: center;
+    align-content: center;
+    font-size: 10pt;
+    width: 2em;
+    height: 2em;
+}
+
+.todo > :nth-last-child(2) {
+  margin-left: auto;
+}
+
+.todo .delete {
+    background-color: #fa7a6b;
+}
+
+.todo .delete:hover,
+.todo .delete:focus {
+    background-color: #f73722;
+}
+
+.todo .edit {
+    background-color: #eee;
+    color: black;
+}
+
+.todo .edit:focus,
+.todo .edit:hover {
+    background-color: #ddd;
+}
+

@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
-import type { TodoItem } from "../types/TodoItem";
+import type { TodoItem } from "../types";
+import "./AddTodo.css";
 
 type AddTodoProps = {
     handleAdd: (todo: TodoItem) => void;
@@ -11,6 +12,7 @@ export default function AddTodo({ handleAdd }: AddTodoProps) {
     const onSubmit = async (e: FormEvent) => {
         e.preventDefault();
         const body = { summary };
+        setSummary("");
 
         try {
             const response = await fetch("http://localhost:5000/todos/", {
@@ -24,6 +26,7 @@ export default function AddTodo({ handleAdd }: AddTodoProps) {
             if (!response.ok) {
                 throw new Error(`Reponse status: ${response.status}`)
             }
+
             const todo = await response.json();
 
             handleAdd(todo);
@@ -34,14 +37,13 @@ export default function AddTodo({ handleAdd }: AddTodoProps) {
         }
     }
 
-    return <>
-        <form onSubmit={onSubmit}>
-            <input
-                type="text"
-                value={summary}
-                onChange={e => setSummary(e.target.value)}
-            />
-            <button>add todo</button>
-        </form>
-    </>;
+    return <form onSubmit={onSubmit} className="add-todo-form">
+        <input
+            type="text"
+            value={summary}
+            onChange={e => setSummary(e.target.value)}
+            className="add-todo-input"
+        />
+        <button>add todo</button>
+    </form>;
 }

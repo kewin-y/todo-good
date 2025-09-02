@@ -1,0 +1,21 @@
+.container {
+    margin: auto;
+    margin-top: 2em;
+    width: 40%;
+}
+
+.todo-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+hr {
+    border: unset;
+    border-top: 1px solid #dddddd;
+    margin: 0.8rem 0;
+}

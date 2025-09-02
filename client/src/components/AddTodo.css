@@ -1,0 +1,8 @@
+.add-todo-form {
+    display: flex;
+    gap: 1em;
+}
+
+.add-todo-form > input[type="text"] {
+    flex-grow: 1;
+}

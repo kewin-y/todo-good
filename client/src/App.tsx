@@ -3,6 +3,7 @@ import { type TodoItem } from "./types";
 import { useRef, useEffect, useReducer, useState } from "react";
 import Todo from "./components/Todo";
 import EditTodoModal from "./components/EditTodoModal";
+import "./App.css";
 
 type TodoAction =
     | { type: 'INIT'; payload: { allTodos: TodoItem[] } }
@@ -86,7 +87,7 @@ export default function App() {
 
     }
 
-    return <>
+    return <div className="container">
         <AddTodo handleAdd={handleAdd} />
         <hr />
         <EditTodoModal
@@ -95,21 +96,19 @@ export default function App() {
             modalClose={() => { setModalOpen(false) }}
             handleUpdate={handleUpdate}
         />
-        <table className="todo-list">
-            <tbody>
-                {todoItems.map((todoItem) => (
-                    <Todo
-                        todoItem={todoItem}
-                        handleDelete={handleDelete}
-                        handleUpdate={handleUpdate}
-                        onEdit={() => {
-                            setEditingTodo(todoItem);
-                            setModalOpen(true);
-                        }}
-                        key={todoItem.id}
-                    />
-                ))}
-            </tbody>
-        </table>
-    </>;
+        <ul className="todo-list">
+            {todoItems.map((todoItem) => (
+                <Todo
+                    todoItem={todoItem}
+                    handleDelete={handleDelete}
+                    handleUpdate={handleUpdate}
+                    onEdit={() => {
+                        setEditingTodo(todoItem);
+                        setModalOpen(true);
+                    }}
+                    key={todoItem.id}
+                />
+            ))}
+        </ul>
+    </div>;
 }

@@ -1,5 +1,5 @@
 import { type TodoItem } from '../types';
-import { PiNotePencil, PiX } from 'react-icons/pi';
+import { BsTrash3Fill, BsPencilSquare } from 'react-icons/bs';
 import "./Todo.css";
 import type { ChangeEvent } from "react";
 
@@ -30,10 +30,17 @@ export default function Todo({ todoItem, handleDelete, handleUpdate, onEdit }: T
         handleUpdate({ ...todoItem, completed })
     };
 
-    return <tr className="todo">
-        <td><input type="checkbox" checked={todoItem.completed} id={`todo-${todoItem.id}`} onChange={onToggle} /></td>
-        <td><label>{todoItem.summary}</label></td>
-        <td><button onClick={onEdit}><PiNotePencil /></button></td>
-        <td><button onClick={onDelete}><PiX /></button></td>
-    </tr>;
+    return <li className="todo">
+        <label className="form-control">
+            <input
+                type="checkbox"
+                checked={todoItem.completed}
+                id={`todo-${todoItem.id}`}
+                onChange={onToggle}
+            />
+            <span>{todoItem.summary}</span>
+        </label>
+        <button onClick={onEdit} className='edit'><BsPencilSquare /></button>
+        <button onClick={onDelete} className='delete'><BsTrash3Fill /></button>
+    </li>;
 }
