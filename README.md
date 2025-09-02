@@ -14,3 +14,11 @@ pg_ctl -D .tmp/pgdata stop
 pgcli -U postgres
 ```
 
+## Screenshots
+
+![todo-good](./assets/todo-good.png)
+![edit todo](./assets/edit-todo.png)
+
+## Notes
+
+- There is currently no user system, so the project **will not be deployed**.

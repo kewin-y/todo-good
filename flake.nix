@@ -36,6 +36,9 @@
           ];
 
           shellHook = ''
+            mkdir -p .tmp/pgdata
+            mkdir -p .tmp/sockets
+
             export SHELL='${pkgs.mksh}/bin/mksh'
             export PGHOST="$(pwd)/.tmp/sockets"
           '';
