@@ -22,3 +22,9 @@ pgcli -U postgres
 ## Notes
 
 - There is currently no user system, so the project **will not be deployed**.
+
+## TODO
+
+- [ ] Make development experience less of a headache
+    - i.e., automate database directory making, etc.
+- [ ] Make instructions for running
