@@ -1,5 +1,7 @@
 # Todo Good
 
+Simple todo app created for learing purposes
+
 ## Postgresql Help
 
 The devshell contains the latest version of Postgresql
@@ -19,12 +21,9 @@ pgcli -U postgres
 ![todo-good](./assets/todo-good.png)
 ![edit todo](./assets/edit-todo.png)
 
-## Notes
-
-- There is currently no user system, so the project **will not be deployed**.
-
 ## TODO
 
 - [ ] Make development experience less of a headache
     - i.e., automate database directory making, etc.
+- [ ] Implement a user system
 - [ ] Make instructions for running
